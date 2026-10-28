@@ -1,0 +1,27 @@
+{
+  "name": "edge-microservice",
+  "version": "2.4.0",
+  "variables": {
+    "SERVICE_NAME": "auth-gateway",
+    "PORT": "8080",
+    "METRICS_PORT": "9090"
+  },
+  "files": [
+    {
+      "path": "server.js",
+      "template": true,
+      "content": "import http from 'node:http';\n\nconst server = http.createServer((req, res) => {\n  res.writeHead(200, { 'Content-Type': 'application/json' });\n  res.end(JSON.stringify({ service: '{{SERVICE_NAME}}', status: 'healthy' }));\n});\n\nserver.listen({{PORT}}, () => console.log('{{SERVICE_NAME}} listening on {{PORT}}'));\n"
+    },
+    {
+      "path": "Dockerfile",
+      "template": true,
+      "content": "FROM node:20-alpine\nWORKDIR /app\nCOPY . .\nEXPOSE {{PORT}}\nCMD [\"node\", \"server.js\"]\n"
+    },
+    {
+      "path": "healthcheck.sh",
+      "mode": 493,
+      "template": true,
+      "content": "#!/bin/sh\ncurl -f http://localhost:{{PORT}}/health || exit 1\n"
+    }
+  ]
+}

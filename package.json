@@ -1,0 +1,31 @@
+{
+  "name": "streamforge-cli",
+  "version": "1.0.0",
+  "description": "High-performance streaming pipeline & build automation engine with zero external telemetry and sub-50ms startup",
+  "type": "module",
+  "main": "lib/core/pipeline-orchestrator.js",
+  "bin": {
+    "streamforge": "./bin/streamforge.js"
+  },
+  "scripts": {
+    "start": "node bin/streamforge.js",
+    "test": "node tests/runner.js",
+    "test:coverage": "node --experimental-test-coverage tests/runner.js",
+    "benchmark": "node bin/streamforge.js run --pipeline examples/pipelines/build-pipeline.json --benchmark"
+  },
+  "keywords": [
+    "cli",
+    "stream",
+    "transform",
+    "pipeline",
+    "automation",
+    "build-tool",
+    "zero-telemetry",
+    "performance"
+  ],
+  "author": "Antigravity Engineering",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "env": "production",
+  "endpoint": "https://api.internal.local/v1"
+}

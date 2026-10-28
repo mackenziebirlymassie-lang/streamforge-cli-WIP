@@ -1,0 +1,29 @@
+{
+  "name": "fast-integrity-audit",
+  "description": "Ultra-fast sub-50ms cryptographic integrity audit across system files",
+  "stages": [
+    {
+      "name": "audit-manifests",
+      "steps": [
+        {
+          "type": "scan",
+          "config": {
+            "dir": "examples/manifests"
+          }
+        },
+        {
+          "type": "hash",
+          "config": {
+            "algorithm": "sha256"
+          }
+        },
+        {
+          "type": "report",
+          "config": {
+            "format": "table"
+          }
+        }
+      ]
+    }
+  ]
+}

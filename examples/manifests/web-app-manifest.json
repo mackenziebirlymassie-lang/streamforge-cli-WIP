@@ -1,0 +1,52 @@
+{
+  "name": "modern-web-app",
+  "version": "1.0.0",
+  "variables": {
+    "APP_NAME": "NexusFlow Web App",
+    "AUTHOR": "Engineering Team",
+    "YEAR": "2026",
+    "API_ENDPOINT": "https://api.internal.local/v1"
+  },
+  "files": [
+    {
+      "path": "package.json",
+      "mode": 420,
+      "template": true,
+      "content": "{\n  \"name\": \"{{APP_NAME}}\",\n  \"version\": \"1.0.0\",\n  \"author\": \"{{AUTHOR}}\",\n  \"private\": true\n}\n"
+    },
+    {
+      "path": "README.md",
+      "mode": 420,
+      "template": true,
+      "content": "# {{APP_NAME}}\n\nGenerated with StreamForge CLI in {{YEAR}}.\n\nAPI: {{API_ENDPOINT}}\n"
+    },
+    {
+      "path": "src/index.js",
+      "mode": 420,
+      "template": true,
+      "content": "/**\n * {{APP_NAME}} - Main Entrypoint\n * Copyright {{YEAR}} {{AUTHOR}}\n */\n\nconsole.log('Booting {{APP_NAME}} on {{API_ENDPOINT}}');\n"
+    },
+    {
+      "path": "src/utils/helpers.js",
+      "mode": 420,
+      "content": "export function sanitize(input) {\n  return String(input).trim();\n}\n"
+    },
+    {
+      "path": "public/index.html",
+      "mode": 420,
+      "template": true,
+      "content": "<!DOCTYPE html>\n<html>\n<head>\n  <title>{{APP_NAME}}</title>\n</head>\n<body>\n  <h1>Welcome to {{APP_NAME}}</h1>\n</body>\n</html>\n"
+    },
+    {
+      "path": "public/styles.css",
+      "mode": 420,
+      "content": "body {\n  margin: 0;\n  font-family: sans-serif;\n  background: #0b111a;\n  color: #f8fafc;\n}\n"
+    },
+    {
+      "path": "config/production.json",
+      "mode": 420,
+      "template": true,
+      "content": "{\n  \"env\": \"production\",\n  \"endpoint\": \"{{API_ENDPOINT}}\"\n}\n"
+    }
+  ]
+}
