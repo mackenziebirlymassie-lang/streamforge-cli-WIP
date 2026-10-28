@@ -1,0 +1,65 @@
+{
+  "name": "full-production-build",
+  "description": "Multi-stage stream processing build pipeline with filtering, template substitution, hashing, and bundling",
+  "stages": [
+    {
+      "name": "scan-sources",
+      "steps": [
+        {
+          "type": "scan",
+          "config": {
+            "dir": "lib"
+          }
+        },
+        {
+          "type": "filter",
+          "config": {
+            "patterns": [
+              "**/*.js",
+              "!**/*.test.js"
+            ]
+          }
+        },
+        {
+          "type": "hash",
+          "config": {
+            "algorithm": "sha256"
+          }
+        },
+        {
+          "type": "report",
+          "config": {
+            "format": "table"
+          }
+        }
+      ]
+    },
+    {
+      "name": "compile-and-bundle",
+      "dependsOn": [
+        "scan-sources"
+      ],
+      "steps": [
+        {
+          "type": "scan",
+          "config": {
+            "dir": "lib"
+          }
+        },
+        {
+          "type": "compile",
+          "config": {
+            "header": "/** Built with StreamForge Zero-Telemetry Engine */",
+            "minifyWhitespace": false
+          }
+        },
+        {
+          "type": "bundle",
+          "config": {
+            "outDir": ".build-cache"
+          }
+        }
+      ]
+    }
+  ]
+}
