@@ -83,5 +83,58 @@ export async function run() {
     assert.strictEqual(customExecuted, true);
   });
 
+  // 4. Concurrency Waves
+  await test('DAGExecutor: partitions independent stages into concurrent waves', async () => {
+    const pipelineDef = {
+      name: 'wave-test',
+      stages: [
+        { name: 'frontend', dependsOn: [], steps: [] },
+        { name: 'backend', dependsOn: [], steps: [] },
+        { name: 'integration', dependsOn: ['frontend', 'backend'], steps: [] },
+        { name: 'deploy', dependsOn: ['integration'], steps: [] },
+      ],
+    };
+
+    const executor = new DAGExecutor(pipelineDef);
+    const waves = executor.getExecutionWaves();
+    assert.strictEqual(waves.length, 3);
+    const wave0 = waves[0].map(s => s.name).sort();
+    assert.deepStrictEqual(wave0, ['backend', 'frontend']);
+    assert.strictEqual(waves[1][0].name, 'integration');
+    assert.strictEqual(waves[2][0].name, 'deploy');
+  });
+
+  // 5. Parallel Execution
+  await test('DAGExecutor: executes stages concurrently across parallel waves', async () => {
+    let stage1Ran = false;
+    let stage2Ran = false;
+
+    const testRegistry = GlobalStepRegistry;
+    testRegistry.registerStep('stage1-op', () => ({
+      on: (evt, fn) => { if (evt === 'end') fn(); },
+      resume: () => { stage1Ran = true; },
+    }));
+    testRegistry.registerStep('stage2-op', () => ({
+      on: (evt, fn) => { if (evt === 'end') fn(); },
+      resume: () => { stage2Ran = true; },
+    }));
+
+    const pipelineDef = {
+      name: 'parallel-exec-test',
+      stages: [
+        { name: 's1', dependsOn: [], steps: [{ type: 'stage1-op', config: {} }] },
+        { name: 's2', dependsOn: [], steps: [{ type: 'stage2-op', config: {} }] },
+      ],
+    };
+
+    const executor = new DAGExecutor(pipelineDef, { stepRegistry: testRegistry, parallel: true });
+    const result = await executor.execute();
+
+    assert.strictEqual(result.stages['s1'].status, 'SUCCESS');
+    assert.strictEqual(result.stages['s2'].status, 'SUCCESS');
+    assert.strictEqual(stage1Ran, true);
+    assert.strictEqual(stage2Ran, true);
+  });
+
   return { passed, failed };
 }
