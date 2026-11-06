@@ -7,10 +7,17 @@
   "bin": {
     "streamforge": "./bin/streamforge.js"
   },
+  "files": [
+    "bin",
+    "lib",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "start": "node bin/streamforge.js",
     "test": "node tests/runner.js",
     "test:coverage": "node --experimental-test-coverage tests/runner.js",
+    "check": "node --check bin/streamforge.js",
     "benchmark": "node bin/streamforge.js run --pipeline examples/pipelines/build-pipeline.json --benchmark"
   },
   "keywords": [
