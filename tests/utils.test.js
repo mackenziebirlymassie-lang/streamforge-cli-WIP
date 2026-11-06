@@ -66,5 +66,23 @@ export async function run() {
     await fs.unlink(tempFile);
   });
 
+  // 5. FileUtils: atomic write failure rollback cleanup
+  await test('FileUtils: writeAtomic cleans up temp file on failure', async () => {
+    // Attempting to write into an existing file treated as a directory will fail during writeFile or rename
+    const blockingFile = 'tests/.tmp-blocker.txt';
+    await fs.writeFile(blockingFile, 'blocker');
+    const invalidTarget = `${blockingFile}/child.txt`;
+
+    let threw = false;
+    try {
+      await writeAtomic(invalidTarget, 'test');
+    } catch {
+      threw = true;
+    }
+    assert.strictEqual(threw, true);
+
+    await fs.unlink(blockingFile);
+  });
+
   return { passed, failed };
 }

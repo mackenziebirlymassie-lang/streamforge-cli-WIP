@@ -11,6 +11,7 @@ import { LicenseAuditor, LicensePolicy } from '../lib/automation/license-auditor
 import { ChangelogGenerator, CommitType } from '../lib/automation/changelog-generator.js';
 import { ReleaseOrchestrator } from '../lib/automation/release-orchestrator.js';
 import { MonorepoManager } from '../lib/automation/monorepo-manager.js';
+import { EnvVault } from '../lib/automation/env-vault.js';
 
 export async function run() {
   let passed = 0;
@@ -95,6 +96,32 @@ export async function run() {
     const monorepo = new MonorepoManager('nonexistent-dir');
     const packages = await monorepo.discoverPackages();
     assert.deepStrictEqual(packages, []);
+  });
+
+  // 6. EnvVault (Dynamic 4-part salt, legacy 3-part fallback, parity audit)
+  await test('EnvVault: encrypts with random salt and decrypts legacy + modern payloads', async () => {
+    const vault = new EnvVault('super-secret-key-123');
+    const secret = 'DATABASE_URL=postgres://user:pass@localhost:5432/db';
+
+    // Modern 4-part format: salt:iv:authTag:cipher
+    const encrypted = vault.encrypt(secret);
+    const parts = encrypted.split(':');
+    assert.strictEqual(parts.length, 4);
+
+    const decrypted = vault.decrypt(encrypted);
+    assert.strictEqual(decrypted, secret);
+
+    // Two encryptions of same plaintext produce distinct ciphertexts due to dynamic salt & IV
+    const encrypted2 = vault.encrypt(secret);
+    assert.notStrictEqual(encrypted, encrypted2);
+
+    // Parity audit test
+    const example = 'PORT=3000\nDATABASE_URL=\nAPI_KEY=';
+    const actual = 'PORT=3000\nDATABASE_URL=postgres://...\nEXTRA_VAR=1';
+    const parity = vault.auditEnvParity(example, actual);
+    assert.strictEqual(parity.isSynced, false);
+    assert.deepStrictEqual(parity.missingKeys, ['API_KEY']);
+    assert.deepStrictEqual(parity.extraneousKeys, ['EXTRA_VAR']);
   });
 
   return { passed, failed };
