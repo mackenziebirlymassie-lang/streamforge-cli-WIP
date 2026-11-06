@@ -112,5 +112,42 @@ export async function run() {
     assert.ok(help.includes('run'));
   });
 
+  // 6. Help text for leaf command without subcommands
+  test('Command: formats leaf command help text without [command]', () => {
+    const leaf = new Command('run');
+    leaf.description('Run pipeline');
+    leaf.option('-p, --pipeline <file>', 'Pipeline path');
+
+    const help = leaf.helpInformation();
+    assert.ok(help.includes('Usage: run [options]'));
+    assert.ok(!help.includes('run [command]'));
+  });
+
+  // 7. Clustered short boolean flags (-sv)
+  test('Command: parses clustered short boolean flags', () => {
+    let captured = null;
+    const cmd = new Command('cluster');
+    cmd
+      .option('-s, --silent', 'Silent')
+      .option('-v, --verbose', 'Verbose')
+      .action((opts) => {
+        captured = opts;
+      });
+
+    cmd.parse(['node', 'cluster', '-sv']);
+    assert.strictEqual(captured.silent, true);
+    assert.strictEqual(captured.verbose, true);
+  });
+
+  // 8. Exit override for testing help and version
+  test('Command: exitOverride intercepts help and version gracefully', () => {
+    const cmd = new Command('test').version('1.5.0').exitOverride();
+    const resVer = cmd.parse(['node', 'test', '--version']);
+    assert.strictEqual(resVer.version, '1.5.0');
+
+    const resHelp = cmd.parse(['node', 'test', '--help']);
+    assert.strictEqual(resHelp.help, true);
+  });
+
   return { passed, failed };
 }
