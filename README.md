@@ -160,13 +160,102 @@ node bin/streamforge.js diff -m examples/manifests/web-app-manifest.json -t dist
 Renders a structured Unicode box-drawing directory tree with file sizes and SHA-256 content hashes.
 
 ```bash
-node bin/streamforge.js tree lib/
+node bin/streamforge.js tree --dir lib/
 ```
 
 **Options:**
-- `-d, --max-depth <num>`: Maximum recursion depth.
-- `-a, --all`: Include hidden files starting with `.`.
-- `--ascii`: Use ASCII characters (`+-- `, `|-- `) instead of Unicode box-drawing.
+- `-d, --dir <path>`: Directory path to render.
+- `--depth <n>`: Maximum directory recursion depth.
+- `--ascii`: Use ASCII characters instead of Unicode box-drawing.
+- `-f, --format <type>`: Output format (`text`, `json`).
+
+---
+
+### `streamforge audit`
+Scans source files for leaked API keys, tokens, hardcoded passwords, and dangerous dynamic code execution.
+
+```bash
+node bin/streamforge.js audit -d src/
+```
+
+**Options:**
+- `-d, --dir <path>`: Directory to scan (default: `.`).
+- `-f, --format <type>`: Output format (`table`, `json`).
+- `--fail-on-critical`: Exit with code 1 if critical leaks are detected (default: `true`).
+
+---
+
+### `streamforge license`
+Audits package dependencies against open-source license policy (permissive, restricted, prohibited).
+
+```bash
+node bin/streamforge.js license -p package.json
+```
+
+**Options:**
+- `-p, --package <file>`: Path to package.json (default: `package.json`).
+- `-f, --format <type>`: Output format (`table`, `json`).
+
+---
+
+### `streamforge changelog`
+Generates semantic markdown release notes from conventional commit messages.
+
+```bash
+node bin/streamforge.js changelog -v 1.1.0
+```
+
+**Options:**
+- `-v, --version <ver>`: Target release version.
+- `-d, --date <date>`: Release date in YYYY-MM-DD.
+- `-o, --output <file>`: Optional output file path.
+
+---
+
+### `streamforge docker`
+Generates a minimal, hardened production multi-stage Dockerfile and `.dockerignore`.
+
+```bash
+node bin/streamforge.js docker --node-version 22 --port 8080 -o Dockerfile
+```
+
+---
+
+### `streamforge vault`
+Encrypts, decrypts, or audits `.env` secrets with AES-256-GCM and dynamic cryptographic salts.
+
+```bash
+node bin/streamforge.js vault -a encrypt -i .env -k "my-passphrase"
+node bin/streamforge.js vault -a decrypt -i .env.vault -k "my-passphrase"
+node bin/streamforge.js vault -a audit -i .env -e .env.example
+```
+
+---
+
+### `streamforge verify`
+Generates and audits cryptographic SHA-256 checksum manifests and reproducible build provenance certificates.
+
+```bash
+node bin/streamforge.js verify -d dist/ -m manifest.sha256
+node bin/streamforge.js verify -d dist/ --cert
+```
+
+---
+
+### `streamforge graph`
+Analyzes dependency import specifiers, constructs import graphs, and detects circular dependency cycles.
+
+```bash
+node bin/streamforge.js graph -e bin/streamforge.js -f ascii
+```
+
+---
+
+### `streamforge optimize`
+Audits bundle chunk sizes, identifies duplicate chunks, and provides optimization recommendations.
+
+```bash
+node bin/streamforge.js optimize -d dist/ --max-bundle 500000 --max-chunk 100000
 
 ---
 
@@ -245,28 +334,29 @@ node tests/runner.js
 ```text
 🚀 Running StreamForge 100% Test Suite & Latency Suite...
 
-  • CLI Engine Unit Tests                  ✔ PASS (7 assertions, 7.37ms)
-  • Async Stream Transforms Tests          ✔ PASS (8 assertions, 56.28ms)
-  • Manifest & Schema Tests                ✔ PASS (5 assertions, 17.83ms)
-  • Pipeline DAG Executor Tests            ✔ PASS (3 assertions, 7.75ms)
-  • Terminal UX & Formatter Tests          ✔ PASS (5 assertions, 5.36ms)
-  • System Utilities Tests                 ✔ PASS (4 assertions, 6.86ms)
-  • Developer Automation Suite Tests       ✔ PASS (5 assertions, 12.87ms)
-  • Advanced Automation Suite Tests        ✔ PASS (5 assertions, 26.83ms)
+  • CLI Engine Unit Tests                  ✔ PASS (10 assertions, 11.80ms)
+  • Async Stream Transforms Tests          ✔ PASS (9 assertions, 95.69ms)
+  • Manifest & Schema Tests                ✔ PASS (5 assertions, 16.43ms)
+  • Pipeline DAG Executor Tests            ✔ PASS (5 assertions, 19.28ms)
+  • Terminal UX & Formatter Tests          ✔ PASS (5 assertions, 18.91ms)
+  • System Utilities Tests                 ✔ PASS (5 assertions, 9.03ms)
+  • Developer Automation Suite Tests       ✔ PASS (6 assertions, 262.96ms)
+  • Advanced Automation Suite Tests        ✔ PASS (5 assertions, 43.99ms)
+  • Extended Automation Suite Tests        ✔ PASS (4 assertions, 69.81ms)
   • Integration & Benchmark Tests          
 ⚡ Running Performance Benchmark (3 iterations)...
-  Iteration 1: 2.85 ms
-  Iteration 2: 2.73 ms
-  Iteration 3: 2.83 ms
+  Iteration 1: 2.23 ms
+  Iteration 2: 7.45 ms
+  Iteration 3: 3.62 ms
 ────────────────────────────────────────
-  Average: 2.80 ms
-  Min:     2.73 ms | Max: 2.85 ms
+  Average: 4.43 ms
+  Min:     2.23 ms | Max: 7.45 ms
   Sub-50ms Guarantee: PASSED (✔ < 50ms)
 
-✔ PASS (4 assertions, 76.57ms)
-  • Edge Cases & Error Trapping Tests      ✔ PASS (4 assertions, 17.05ms)
+✔ PASS (4 assertions, 103.43ms)
+  • Edge Cases & Error Trapping Tests      ✔ PASS (4 assertions, 17.91ms)
 
 ──────────────────────────────────────────────────
-Total Tests: 50  │  Passed: 50  │  Failed: 0  │  Duration: 235.92ms
+Total Tests: 62  │  Passed: 62  │  Failed: 0  │  Duration: 671.12ms
 Zero External Telemetry: VERIFIED (100% offline)  │  Test Coverage: 100% Complete
 ```

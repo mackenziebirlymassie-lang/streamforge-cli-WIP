@@ -18,7 +18,11 @@
     "test": "node tests/runner.js",
     "test:coverage": "node --experimental-test-coverage tests/runner.js",
     "check": "node --check bin/streamforge.js",
-    "benchmark": "node bin/streamforge.js run --pipeline examples/pipelines/build-pipeline.json --benchmark"
+    "benchmark": "node bin/streamforge.js run --pipeline examples/pipelines/audit-pipeline.json --benchmark",
+    "audit": "node bin/streamforge.js audit",
+    "license": "node bin/streamforge.js license",
+    "docker": "node bin/streamforge.js docker",
+    "verify": "node bin/streamforge.js verify"
   },
   "keywords": [
     "cli",

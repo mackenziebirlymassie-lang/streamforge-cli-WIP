@@ -20,6 +20,7 @@ const suites = [
   { name: 'System Utilities Tests', path: './utils.test.js' },
   { name: 'Developer Automation Suite Tests', path: './automation.test.js' },
   { name: 'Advanced Automation Suite Tests', path: './advanced-automation.test.js' },
+  { name: 'Extended Automation Suite Tests', path: './untested-automation.test.js' },
   { name: 'Integration & Benchmark Tests', path: './integration.test.js' },
   { name: 'Edge Cases & Error Trapping Tests', path: './edge-cases.test.js' },
 ];
