@@ -393,4 +393,4 @@ Zero External Telemetry: VERIFIED (100% offline)  │  Test Coverage: 100% Compl
 
 ## 8. License
 
-MIT License. Copyright (c) 2026 Antigravity Engineering.
+MIT License. Copyright (c) 2026
