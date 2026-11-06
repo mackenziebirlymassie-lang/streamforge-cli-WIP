@@ -14,6 +14,8 @@ import { CompilerStream } from '../lib/streams/compiler-stream.js';
 import { BundlerStream } from '../lib/streams/bundler-stream.js';
 import { TreeFormatterStream } from '../lib/streams/tree-formatter-stream.js';
 import { ReportSinkStream } from '../lib/streams/report-sink-stream.js';
+import { FileScannerStream } from '../lib/streams/file-scanner-stream.js';
+import { SecurityScannerStream } from '../lib/automation/security-scanner.js';
 import { promises as fs } from 'node:fs';
 
 export async function run() {
@@ -174,6 +176,22 @@ export async function run() {
     const parsed = JSON.parse(jsonStr);
     assert.strictEqual(parsed.totalFiles, 2);
     assert.strictEqual(parsed.totalBytes, 350);
+  });
+
+  // 9. SecurityScannerStream lazy content loading with FileScannerStream
+  await test('SecurityScannerStream: lazy loads content when piped from FileScannerStream', async () => {
+    const tempDir = 'tests/.tmp-scanner-stream';
+    await fs.mkdir(tempDir, { recursive: true });
+    await fs.writeFile(`${tempDir}/secret.js`, 'const token = "ghp_123456789012345678901234567890123456";');
+
+    const scanner = new SecurityScannerStream();
+    const scannerSource = new FileScannerStream(tempDir);
+
+    await pipeline(scannerSource, scanner);
+    assert.strictEqual(scanner.findings.length, 1);
+    assert.strictEqual(scanner.findings[0].ruleId, 'SEC_GITHUB_TOKEN');
+
+    await fs.rm(tempDir, { recursive: true, force: true });
   });
 
   return { passed, failed };
